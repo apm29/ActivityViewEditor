@@ -1,5 +1,5 @@
 /** Used to generate unique IDs. */
-var idCounter = 0;
+let idCounter = 0;
 
 /**
  * Generates a unique ID. If `prefix` is given, the ID is appended to it.
