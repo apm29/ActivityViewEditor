@@ -14,6 +14,14 @@
             <div slot="footer">
             </div>
         </Modal>
+        <Drawer title="编辑" :closable="false" v-model="dialogConfigs.showEditDrawer">
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <template v-slot:header>
+                <Button type="error" long @click="deleteConditionBranch(dialogConfigs.editData)">删除条件分支</Button>
+            </template>
+        </Drawer>
         <Button size="large" style="position: fixed;right: 30px;bottom: 30px" @click="save">SAVE</Button>
         <div id="miniMap" style="position: fixed;left: 30px;bottom: 30px"></div>
     </div>
@@ -47,6 +55,8 @@
         dialogConfigs: {
           showAddType: false,
           parentNode: undefined,
+          showEditDrawer: false,
+          editData:undefined
         },
         data: {
           nodes: [
@@ -94,6 +104,7 @@
           default: ['drag-canvas', 'zoom-canvas'],
           edit: ['click-select'],
         },
+        enabledStack:true,
         plugins: [grid, miniMap],
         layout: {
           type: 'dagre',
@@ -116,7 +127,7 @@
       let { graph } = this
       initiatorNode.register(graph)
       addBtnNode.register(graph, this.showAdd)
-      conditionNode.register(graph)
+      conditionNode.register(graph,this.showConditionEditDrawer)
       addConditionBtnNode.register(graph, (ev) => this.addConditionNode(ev.item))
       actionNode.register(graph)
       endNode.register(graph)
@@ -339,6 +350,78 @@
       showAdd: function (ev) {
         this.dialogConfigs.parentNode = ev.item
         this.dialogConfigs.showAddType = true
+      },
+      //显示条件编辑对话框
+      showConditionEditDrawer: function (ev) {
+        this.dialogConfigs.editData = ev.item
+        this.dialogConfigs.showEditDrawer = true
+      },
+      deleteConditionBranch:function(node){
+        this.deleteFromNodeToLCAConnectionNode(node)
+        this.dialogConfigs.editData = undefined
+        this.dialogConfigs.showEditDrawer = false
+      },
+      deleteFromNodeToLCAConnectionNode:function(node){
+        let { doDelete,findLCANode, findLCAConnectionNode, graph, nextNodes } = this
+        // 1. 找条件节点
+        let parentNode = node.get('edges').filter(e=>e.get('target') === node)[0].get('source')
+        let parentId = parentNode.get('id')
+        // 2. 根据同一层条件节点找LCA
+        let nodeLCA = findLCANode(nextNodes,graph,parentId,findLCAConnectionNode)
+        //查询兄弟节点
+        let siblingNodes = node.get('edges').filter(e=>e.get('target') === node)[0].get('source').get('edges').filter(e=>e.get('source') === parentNode).map(edge=>edge.get('target'))
+        console.log(siblingNodes)
+
+        function getNextNode (node) {
+          return node.get('edges').filter(e => e.get('source') === node)[0].get('target')
+        }
+        function getPreviousNode (node) {
+          return node.get('edges').filter(e => e.get('target') === node)[0].get('source')
+        }
+
+        if(siblingNodes.length === 2){
+          //从parentNode开始删除节点直到遇到LCA节点后的第二节点
+          let nextNode = getNextNode(getNextNode(nodeLCA))
+          let previousNode = getPreviousNode(parentNode)
+          console.log(nextNode.get('id'))
+          doDelete(parentNode, nextNode)
+          //删除startNode
+          parentNode.get('edges').forEach(edge => {
+            graph.removeItem(edge)
+          })
+          graph.removeItem(parentNode)
+          //连接前节点和下节点
+          graph.addItem('edge',{
+            source:previousNode.get('id'),
+            target:nextNode.get('id')
+          })
+        }else {
+          //从node开始删除节点直到遇到LCA节点
+          doDelete(node, nodeLCA)
+          //删除startNode
+          node.get('edges').forEach(edge => {
+            graph.removeItem(edge)
+          })
+          graph.removeItem(node)
+        }
+
+        graph.updateLayout({})
+        graph.fitView()
+      },
+      doDelete:function(startNode,stopNode){
+        let {graph,doDelete} = this
+
+        startNode.get('edges').filter(e=>e.get('source') === startNode).forEach(edge=>{
+          let newStartNode = edge.get('target')
+          if(newStartNode!==stopNode) {
+            doDelete(newStartNode, stopNode)
+          }
+          graph.removeItem(edge)
+        })
+        //删除所有无边节点并且不是结束节点的
+        graph.findAll('node',(node)=>node.get('edges').length === 0).filter(node=>node.getModel().type!=='endNode').forEach(node=>{
+          graph.removeItem(node)
+        })
       },
       save:function () {
         this.$Modal.info({
