@@ -1,6 +1,6 @@
 import G6 from '@antv/g6'
 import { uniqueId } from '@/utils'
-import logo from '@/assets/logo.png'
+import logo from '@/assets/icons/close.svg'
 const endNode = {
   register(graph) {
     G6.registerNode("endNode", {
