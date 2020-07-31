@@ -76,27 +76,27 @@
         graphData: {
           nodes: [
             {
-              id: '1',
+              id: 'initiatorNode',
               type: 'initiatorNode',
             },
             {
-              id: '2',
+              id: 'addBtnNode',
               type: 'addBtnNode',
             },
             {
-              id: '3',
+              id: 'endNode',
               type: 'endNode',
             },
 
           ],
           edges: [
             {
-              source: '1',
-              target: '2',
+              source: 'initiatorNode',
+              target: 'addBtnNode',
             },
             {
-              source: '2',
-              target: '3',
+              source: 'addBtnNode',
+              target: 'endNode',
             },
           ],
         },
