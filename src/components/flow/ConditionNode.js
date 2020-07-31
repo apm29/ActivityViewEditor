@@ -2,7 +2,7 @@ import G6 from '@antv/g6'
 import { uniqueId } from '@/utils'
 import logo from '@/assets/logo.png'
 const conditionNode = {
-  register(graph,onClick) {
+  register(graph) {
     G6.registerNode("conditionNode", {
       draw(cfg, group) {
         cfg = Object.assign({},{
@@ -115,11 +115,6 @@ const conditionNode = {
         ]
       }
     },'single-node');
-    graph.on('node:click', ev => {
-      //点击事件
-      if(ev.item.getModel().type === 'conditionNode')
-        onClick(ev)
-    });
   }
 };
 

@@ -3,7 +3,7 @@ import { uniqueId } from '@/utils'
 import logo from '@/assets/logo.png'
 
 const addConditionBtnNode = {
-  register (graph,onClick) {
+  register (graph) {
     G6.registerNode('addConditionBtnNode', {
       draw (cfg, group) {
         cfg = Object.assign({}, {
@@ -114,21 +114,6 @@ const addConditionBtnNode = {
         ]
       },
     }, 'single-node')
-    // 点击时选中，再点击时取消
-    graph.on('node:mouseenter', ev => {
-      const node = ev.item;
-      graph.setItemState(node, 'selected', true); // 切换选中
-    });
-    graph.on('node:mouseleave', ev => {
-      const node = ev.item;
-      graph.setItemState(node, 'selected', false); // 切换选中
-    });
-    graph.on('node:click', ev => {
-      //点击事件
-      if(ev.item.getModel().type === 'addConditionBtnNode' && ev.item.get('states').indexOf('hide')===-1) {
-        onClick(ev)
-      }
-    });
   },
 }
 

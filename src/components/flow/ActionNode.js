@@ -2,7 +2,7 @@ import G6 from '@antv/g6'
 import { uniqueId } from '@/utils'
 import logo from '@/assets/logo.png'
 const actionNode = {
-  register(graph,onClick) {
+  register(graph) {
     G6.registerNode("actionNode", {
       draw(cfg, group) {
         cfg = Object.assign({},{
@@ -141,11 +141,7 @@ const actionNode = {
         ]
       }
     },'single-node');
-    graph.on('node:click', ev => {
-      //点击事件
-      if(ev.item.getModel().type === 'actionNode')
-        onClick(ev)
-    });
+
   }
 };
 

@@ -32,9 +32,9 @@
             </template>
         </Drawer>
         <ButtonGroup style="position: fixed;right: 30px;bottom: 30px">
-            <Button size="large"  @click="save">SAVE</Button>
-            <Button size="large"  @click="makeItSimple">SIMPLE</Button>
-            <Button size="large"  @click="reset">RESET</Button>
+            <Button size="large" @click="save">SAVE</Button>
+            <Button size="large" @click="makeItSimple">SIMPLE</Button>
+            <Button size="large" @click="reset">RESET</Button>
         </ButtonGroup>
         <div id="miniMap" style="position: fixed;left: 30px;bottom: 30px"></div>
     </div>
@@ -103,11 +103,19 @@
         graph: undefined,
       }
     },
+    computed: {
+      edgeIds: function () {
+        return this.graphData.edges.map(edge => edge.id)
+      },
+      nodeIds: function () {
+        return this.graphData.nodes.map(node => node.id)
+      },
+    },
     mounted () {
       this.init()
     },
     methods: {
-      init:function(){
+      init: function () {
         const grid = new G6.Grid()
         const miniMap = new G6.Minimap({
           container: 'miniMap',
@@ -151,15 +159,39 @@
         actionNode.register(graph, this.showActionEditDrawer)
         endNode.register(graph)
         connectionNode.register(graph)
+        graph.on('node:click', ev => {
+          //点击事件
+          if(ev.item.getModel().type === 'actionNode')
+            this.showActionEditDrawer(ev)
+          if(ev.item.getModel().type === 'addBtnNode')
+            this.showAdd(ev)
+          if(ev.item.getModel().type === 'conditionNode')
+            this.showConditionEditDrawer(ev)
+          if(ev.item.getModel().type === 'addConditionBtnNode'&& ev.item.get('states').indexOf('hide')===-1)
+            this.addConditionNode(ev.item)
+        });
+        // 点击时选中，再点击时取消
+        graph.on('node:mouseenter', ev => {
+          const node = ev.item;
+          graph.setItemState(node, 'selected', true); // 切换选中
+        });
+        graph.on('node:mouseleave', ev => {
+          const node = ev.item;
+          graph.setItemState(node, 'selected', false); // 切换选中
+        });
 
         graph.data(this.graphData)
-
         graph.render()
       },
+      refreshGraph: function (graph) {
+        graph.updateLayout({})
+        graph.fitView()
+      },
+
       //添加步骤
       //type:办理人/审批人/条件
       addStepNode: function (node, type) {
-        let { graph, dialogConfigs } = this
+        let { graph, dialogConfigs, refreshGraph } = this
         let parentId = node.get('id')
         if (type === 'action') {
           let actionId = uniqueId('action')
@@ -278,12 +310,11 @@
         }
         dialogConfigs.showAddType = false
         dialogConfigs.parentNode = undefined
-        graph.updateLayout({})
-        graph.fitView()
+        refreshGraph(graph)
       },
       //添加条件
       addConditionNode: function (node) {
-        let { findLCANode, findLCAConnectionNode, graph, nextNodes } = this
+        let { findLCANode, findLCAConnectionNode, graph, nextNodes, refreshGraph } = this
         let parentId = node.get('id')
         let conditionId = uniqueId('conditionNode')
         let addId = uniqueId('addBtnNode')
@@ -313,8 +344,7 @@
           })
         }
 
-        graph.updateLayout({})
-        graph.fitView()
+        refreshGraph(graph)
       },
       nextNodes: function (graph, startNodeId) {
         return graph.findAll('edge', function (edge) {
@@ -385,7 +415,7 @@
       },
       //actionNode前后必定是addBtnNode
       deleteAction: function (actionNode) {
-        let { getNextNode, getPreviousNode, graph } = this
+        let { getNextNode, getPreviousNode, graph, refreshGraph } = this
         let nextNode = getNextNode(actionNode)
         let nextNextNode = getNextNode(nextNode)
         let previousNode = getPreviousNode(actionNode)
@@ -405,8 +435,7 @@
 
         this.dialogConfigs.editActionData = undefined
         this.dialogConfigs.showEditActionDrawer = false
-        graph.updateLayout({})
-        graph.fitView()
+        refreshGraph(graph)
       },
       getNextNode: function (node) {
         return node.get('edges').filter(e => e.get('source') === node)[0].get('target')
@@ -415,11 +444,11 @@
       getPreviousNode: function (node) {
         return node.get('edges').filter(e => e.get('target') === node)[0].get('source')
       },
-      getEdgeBetween:function(source,target){
+      getEdgeBetween: function (source, target) {
         return source.get('edges').filter(e => e.get('source') === source && e.get('target') === target)[0]
       },
       deleteFromNodeToLCAConnectionNode: function (node) {
-        let { getNextNode, getPreviousNode, doDelete, findLCANode, findLCAConnectionNode, graph, nextNodes } = this
+        let { getNextNode, getPreviousNode, doDelete, findLCANode, findLCAConnectionNode, graph, nextNodes, refreshGraph } = this
         // 1. 找条件节点
         let parentNode = node.get('edges').filter(e => e.get('target') === node)[0].get('source')
         let parentId = parentNode.get('id')
@@ -457,8 +486,7 @@
           graph.removeItem(node)
         }
 
-        graph.updateLayout({})
-        graph.fitView()
+        refreshGraph(graph)
       },
       doDelete: function (startNode, stopNode) {
         let { graph, doDelete } = this
@@ -478,47 +506,59 @@
           })
       },
       save: function () {
-        this.$Modal.info({
-          content: '已打印到控制台Console',
-        })
         let graphData = this.graph.save()
+        this.$Modal.info({
+          title:'节点与边',
+          render: (h) => {
+            return h('div',
+              {
+                style:{
+                  width:'100%',
+                  height:'320px',
+                  overflow:'auto',
+                }
+              },
+              `nodes:\r\n[${graphData.nodes.map(node => node.id)}],\r\n
+              edges:\r\n[${graphData.edges.map(edge => edge.id)}]`
+            )
+          },
+          scrollable: true,
+        })
         console.log(graphData)
         this.$emit('activity-graph', graphData)
       },
-      makeItSimple:function () {
-        let { deleteAddBtn,hideAddConditionButton, graph } = this
+      makeItSimple: function () {
+        let { deleteAddBtn, hideAddConditionButton, graph } = this
         deleteAddBtn()
         hideAddConditionButton()
         graph.updateLayout({})
         graph.fitView()
         graph.off('node:click')
       },
-      hideAddConditionButton:function(){
+      hideAddConditionButton: function () {
         let { graph } = this
-        graph.findAll('node',(node)=>node.getModel().type === 'addConditionBtnNode')
-        .forEach(node=>{
-          graph.setItemState(node, 'hide', true);
+        graph.findAll('node', (node) => node.getModel().type === 'addConditionBtnNode').forEach(node => {
+          graph.setItemState(node, 'hide', true)
         })
       },
-      deleteAddBtn:function () {
-        let { getNextNode, getPreviousNode,getEdgeBetween, graph } = this
-        graph.findAll('node',(node)=>node.getModel().type === 'addBtnNode')
-        .forEach(node=>{
-            let nextNode = getNextNode(node)
-            let previousNode = getPreviousNode(node)
-            let edgeUpper = getEdgeBetween(previousNode,node)
-            let edgeLower = getEdgeBetween(node,nextNode)
-            //next连到previous
-            graph.updateItem(edgeLower.get('id'),{
-              source:previousNode.get('id'),
-              target:edgeLower.get('target').get('id')
-            })
-            //删除多余的
-            graph.removeItem(edgeUpper)
-            graph.removeItem(node)
+      deleteAddBtn: function () {
+        let { getNextNode, getPreviousNode, getEdgeBetween, graph } = this
+        graph.findAll('node', (node) => node.getModel().type === 'addBtnNode').forEach(node => {
+          let nextNode = getNextNode(node)
+          let previousNode = getPreviousNode(node)
+          let edgeUpper = getEdgeBetween(previousNode, node)
+          let edgeLower = getEdgeBetween(node, nextNode)
+          //next连到previous
+          graph.updateItem(edgeLower.get('id'), {
+            source: previousNode.get('id'),
+            target: edgeLower.get('target').get('id'),
+          })
+          //删除多余的
+          graph.removeItem(edgeUpper)
+          graph.removeItem(node)
         })
       },
-      reset:function () {
+      reset: function () {
         this.graphData = {
           nodes: [
             {
@@ -546,20 +586,31 @@
             },
           ],
         }
-        let { graph } = this
-        initiatorNode.register(graph)
-        addBtnNode.register(graph, this.showAdd)
-        conditionNode.register(graph, this.showConditionEditDrawer)
-        addConditionBtnNode.register(graph, (ev) => this.addConditionNode(ev.item))
-        actionNode.register(graph, this.showActionEditDrawer)
-        endNode.register(graph)
-        connectionNode.register(graph)
-
+        let { graph, refreshGraph } = this
+        graph.on('node:click', ev => {
+          //点击事件
+          if(ev.item.getModel().type === 'actionNode')
+            this.showActionEditDrawer(ev)
+          if(ev.item.getModel().type === 'addBtnNode')
+            this.showAdd(ev)
+          if(ev.item.getModel().type === 'conditionNode')
+            this.showConditionEditDrawer(ev)
+          if(ev.item.getModel().type === 'addConditionBtnNode'&& ev.item.get('states').indexOf('hide')===-1)
+            this.addConditionNode(ev.item)
+        });
+        // 点击时选中，再点击时取消
+        graph.on('node:mouseenter', ev => {
+          const node = ev.item;
+          graph.setItemState(node, 'selected', true); // 切换选中
+        });
+        graph.on('node:mouseleave', ev => {
+          const node = ev.item;
+          graph.setItemState(node, 'selected', false); // 切换选中
+        });
         graph.data(this.graphData)
         graph.render()
-        graph.updateLayout({})
-        graph.fitView()
-      }
+        refreshGraph(graph)
+      },
 
     },
   }

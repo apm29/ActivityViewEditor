@@ -96,20 +96,7 @@ const addBtnNode = {
         ]
       },
     }, 'single-node')
-    // 点击时选中，再点击时取消
-    graph.on('node:mouseenter', ev => {
-      const node = ev.item;
-      graph.setItemState(node, 'selected', true); // 切换选中
-    });
-    graph.on('node:mouseleave', ev => {
-      const node = ev.item;
-      graph.setItemState(node, 'selected', false); // 切换选中
-    });
-    graph.on('node:click', ev => {
-      //点击事件
-      if(ev.item.getModel().type === 'addBtnNode')
-        onClick(ev)
-    });
+
   },
 }
 
