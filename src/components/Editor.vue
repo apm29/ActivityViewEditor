@@ -103,14 +103,7 @@
         graph: undefined,
       }
     },
-    computed: {
-      edgeIds: function () {
-        return this.graphData.edges.map(edge => edge.id)
-      },
-      nodeIds: function () {
-        return this.graphData.nodes.map(node => node.id)
-      },
-    },
+
     mounted () {
       this.init()
     },
