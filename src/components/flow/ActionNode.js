@@ -2,12 +2,12 @@ import G6 from '@antv/g6'
 import { uniqueId } from '@/utils'
 import logo from '@/assets/logo.png'
 const actionNode = {
-  register(graph) {
+  register(graph,onClick) {
     G6.registerNode("actionNode", {
       draw(cfg, group) {
         cfg = Object.assign({},{
           size:[180,40],
-          label:'actionNode节点',
+          label:'审批动作',
           id:uniqueId('actionNode'),
           icon:logo,
           x:0,
@@ -141,6 +141,11 @@ const actionNode = {
         ]
       }
     },'single-node');
+    graph.on('node:click', ev => {
+      //点击事件
+      if(ev.item._cfg.model.type === 'actionNode')
+        onClick(ev)
+    });
   }
 };
 

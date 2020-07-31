@@ -7,7 +7,7 @@ const endNode = {
       draw(cfg, group) {
         cfg = Object.assign({},{
           size:[180,40],
-          label:'endNode节点',
+          label:'结束节点',
           id:uniqueId('endNode'),
           icon:logo,
           x:0,

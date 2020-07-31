@@ -7,7 +7,7 @@ const initiatorNode = {
       draw(cfg, group) {
         cfg = Object.assign({},{
           size:[180,40],
-          label:'initiatorNode节点',
+          label:'起始节点',
           id:uniqueId('initiatorNode'),
           icon:logo,
           x:0,

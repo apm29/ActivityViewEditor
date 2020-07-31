@@ -7,7 +7,7 @@ const conditionNode = {
       draw(cfg, group) {
         cfg = Object.assign({},{
           size:[180,40],
-          label:'conditionNode节点',
+          label:'条件节点',
           id:uniqueId('conditionNode'),
           icon:logo,
           x:0,
