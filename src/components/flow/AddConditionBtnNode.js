@@ -63,6 +63,7 @@ const addConditionBtnNode = {
       setState (name, value, item) {
         const group = item.getContainer();
         const shape = group.get("children")[1]; // 顺序根据 draw 时确定
+        const text = group.get("children")[2]; // 顺序根据 draw 时确定
         const selectStyles = () => {
           shape.attr("fill", "#ddd");
           shape.attr("stroke", "#ddd");
@@ -79,6 +80,14 @@ const addConditionBtnNode = {
           shape.attr("shadowOffsetX", 4);
           shape.attr("shadowOffsetY", 4);
         };
+        const hideStyles = () => {
+          shape.attr("opacity", 0);
+          text.attr("opacity", 0);
+        };
+        const showStyles = () => {
+          shape.attr("opacity", 1);
+          text.attr("opacity", 1);
+        };
         switch (name) {
           case "selected":
           case "hover":
@@ -86,6 +95,13 @@ const addConditionBtnNode = {
               selectStyles()
             } else {
               unSelectStyles()
+            }
+            break;
+          case "hide":
+            if(value) {
+              hideStyles()
+            }else {
+              showStyles()
             }
             break;
         }
@@ -109,8 +125,9 @@ const addConditionBtnNode = {
     });
     graph.on('node:click', ev => {
       //点击事件
-      if(ev.item._cfg.model.type === 'addConditionBtnNode')
+      if(ev.item.getModel().type === 'addConditionBtnNode' && ev.item.get('states').indexOf('hide')===-1) {
         onClick(ev)
+      }
     });
   },
 }

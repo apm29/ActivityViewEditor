@@ -13,16 +13,14 @@ const connectionNode = {
           x:0,
           y:0
         },cfg)
-        let size = 5
-        const offsetX = -size / 2
-        const offsetY = -size / 2
+        let size = 4
         return  group.addShape("circle", {
           attrs: {
             id: cfg.id,
             x: 0,
             y: 0,
-            r: 5,
-            fill: "#ffffff",
+            r: size,
+            fill: "#345db4",
             stroke: '#4444',
             opacity: 1
           }

@@ -117,7 +117,7 @@ const conditionNode = {
     },'single-node');
     graph.on('node:click', ev => {
       //点击事件
-      if(ev.item._cfg.model.type === 'conditionNode')
+      if(ev.item.getModel().type === 'conditionNode')
         onClick(ev)
     });
   }

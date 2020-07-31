@@ -107,7 +107,7 @@ const addBtnNode = {
     });
     graph.on('node:click', ev => {
       //点击事件
-      if(ev.item._cfg.model.type === 'addBtnNode')
+      if(ev.item.getModel().type === 'addBtnNode')
         onClick(ev)
     });
   },

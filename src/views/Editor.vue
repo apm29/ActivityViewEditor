@@ -31,7 +31,11 @@
                 <Button type="error" long @click="deleteAction(dialogConfigs.editConditionData)">删除审批流程</Button>
             </template>
         </Drawer>
-        <Button size="large" style="position: fixed;right: 30px;bottom: 30px" @click="save">SAVE</Button>
+        <ButtonGroup style="position: fixed;right: 30px;bottom: 30px">
+            <Button size="large"  @click="save">SAVE</Button>
+            <Button size="large"  @click="makeItSimple">SIMPLE</Button>
+            <Button size="large"  @click="reset">RESET</Button>
+        </ButtonGroup>
         <div id="miniMap" style="position: fixed;left: 30px;bottom: 30px"></div>
     </div>
 </template>
@@ -69,7 +73,7 @@
           showEditActionDrawer: false,
           editActionData: undefined,
         },
-        data: {
+        graphData: {
           nodes: [
             {
               id: '1',
@@ -100,55 +104,58 @@
       }
     },
     mounted () {
-      const grid = new G6.Grid()
-      const miniMap = new G6.Minimap({
-        container: 'miniMap',
-      })
-      this.graph = new G6.Graph({
-        container: 'container',
-        width: this.$refs.container.clientWidth,
-        height: this.$refs.container.clientHeight,
-        fitView: true,
-        fitViewPadding: [20, 20, 20, 20],
-        fitCenter: true,
-        modes: {
-          default: ['drag-canvas', 'zoom-canvas'],
-          edit: ['click-select'],
-        },
-        enabledStack: true,
-        plugins: [grid, miniMap],
-        layout: {
-          type: 'dagre',
-          center: [200, 200],
-          preventOverlap: true,
-          controlPoints: true,
-          rankdir: 'TB',
-          ranksep: 20,
-          nodesep: 90,
-        },
-        defaultEdge: {
-          type: 'polyline',
-          style: {
-            stroke: 'blue',
-          },
-          sourceAnchor: 1,
-          targetAnchor: 0,
-        },
-      })
-      let { graph } = this
-      initiatorNode.register(graph)
-      addBtnNode.register(graph, this.showAdd)
-      conditionNode.register(graph, this.showConditionEditDrawer)
-      addConditionBtnNode.register(graph, (ev) => this.addConditionNode(ev.item))
-      actionNode.register(graph, this.showActionEditDrawer)
-      endNode.register(graph)
-      connectionNode.register(graph)
-
-      graph.data(this.data)
-
-      graph.render()
+      this.init()
     },
     methods: {
+      init:function(){
+        const grid = new G6.Grid()
+        const miniMap = new G6.Minimap({
+          container: 'miniMap',
+        })
+        this.graph = new G6.Graph({
+          container: 'container',
+          width: this.$refs.container.clientWidth,
+          height: this.$refs.container.clientHeight,
+          fitView: true,
+          fitViewPadding: [20, 20, 20, 20],
+          fitCenter: true,
+          modes: {
+            default: ['drag-canvas', 'zoom-canvas'],
+            edit: ['click-select'],
+          },
+          enabledStack: true,
+          plugins: [grid, miniMap],
+          layout: {
+            type: 'dagre',
+            center: [200, 200],
+            preventOverlap: true,
+            controlPoints: true,
+            rankdir: 'TB',
+            ranksep: 20,
+            nodesep: 90,
+          },
+          defaultEdge: {
+            type: 'polyline',
+            style: {
+              stroke: 'blue',
+            },
+            sourceAnchor: 1,
+            targetAnchor: 0,
+          },
+        })
+        let { graph } = this
+        initiatorNode.register(graph)
+        addBtnNode.register(graph, this.showAdd)
+        conditionNode.register(graph, this.showConditionEditDrawer)
+        addConditionBtnNode.register(graph, (ev) => this.addConditionNode(ev.item))
+        actionNode.register(graph, this.showActionEditDrawer)
+        endNode.register(graph)
+        connectionNode.register(graph)
+
+        graph.data(this.graphData)
+
+        graph.render()
+      },
       //添加步骤
       //type:办理人/审批人/条件
       addStepNode: function (node, type) {
@@ -404,8 +411,12 @@
       getNextNode: function (node) {
         return node.get('edges').filter(e => e.get('source') === node)[0].get('target')
       },
+
       getPreviousNode: function (node) {
         return node.get('edges').filter(e => e.get('target') === node)[0].get('source')
+      },
+      getEdgeBetween:function(source,target){
+        return source.get('edges').filter(e => e.get('source') === source && e.get('target') === target)[0]
       },
       deleteFromNodeToLCAConnectionNode: function (node) {
         let { getNextNode, getPreviousNode, doDelete, findLCANode, findLCAConnectionNode, graph, nextNodes } = this
@@ -474,6 +485,82 @@
         console.log(graphData)
         this.$emit('activity-graph', graphData)
       },
+      makeItSimple:function () {
+        let { deleteAddBtn,hideAddConditionButton, graph } = this
+        deleteAddBtn()
+        hideAddConditionButton()
+        graph.updateLayout({})
+        graph.fitView()
+        graph.off('node:click')
+      },
+      hideAddConditionButton:function(){
+        let { graph } = this
+        graph.findAll('node',(node)=>node.getModel().type === 'addConditionBtnNode')
+        .forEach(node=>{
+          graph.setItemState(node, 'hide', true);
+        })
+      },
+      deleteAddBtn:function () {
+        let { getNextNode, getPreviousNode,getEdgeBetween, graph } = this
+        graph.findAll('node',(node)=>node.getModel().type === 'addBtnNode')
+        .forEach(node=>{
+            let nextNode = getNextNode(node)
+            let previousNode = getPreviousNode(node)
+            let edgeUpper = getEdgeBetween(previousNode,node)
+            let edgeLower = getEdgeBetween(node,nextNode)
+            //next连到previous
+            graph.updateItem(edgeLower.get('id'),{
+              source:previousNode.get('id'),
+              target:edgeLower.get('target').get('id')
+            })
+            //删除多余的
+            graph.removeItem(edgeUpper)
+            graph.removeItem(node)
+        })
+      },
+      reset:function () {
+        this.graphData = {
+          nodes: [
+            {
+              id: '1',
+              type: 'initiatorNode',
+            },
+            {
+              id: '2',
+              type: 'addBtnNode',
+            },
+            {
+              id: '3',
+              type: 'endNode',
+            },
+
+          ],
+          edges: [
+            {
+              source: '1',
+              target: '2',
+            },
+            {
+              source: '2',
+              target: '3',
+            },
+          ],
+        }
+        let { graph } = this
+        initiatorNode.register(graph)
+        addBtnNode.register(graph, this.showAdd)
+        conditionNode.register(graph, this.showConditionEditDrawer)
+        addConditionBtnNode.register(graph, (ev) => this.addConditionNode(ev.item))
+        actionNode.register(graph, this.showActionEditDrawer)
+        endNode.register(graph)
+        connectionNode.register(graph)
+
+        graph.data(this.graphData)
+        graph.render()
+        graph.updateLayout({})
+        graph.fitView()
+      }
+
     },
   }
 </script>
