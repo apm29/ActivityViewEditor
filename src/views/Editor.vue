@@ -314,11 +314,11 @@
       },
       //添加条件
       addConditionNode: function (node) {
-        let { findLCANode, findLCAConnectionNode, graph, nextNodes, refreshGraph } = this
+        let { findLCANode, findLCAConnectionNode, graph, allEdges, refreshGraph } = this
         let parentId = node.get('id')
         let conditionId = uniqueId('conditionNode')
         let addId = uniqueId('addBtnNode')
-        let connectionNode = findLCANode(nextNodes, graph, parentId, findLCAConnectionNode)
+        let connectionNode = findLCANode(allEdges, graph, parentId, findLCAConnectionNode)
         if (connectionNode) {
           graph.addItem('node', {
             type: 'conditionNode',
@@ -346,7 +346,7 @@
 
         refreshGraph(graph)
       },
-      nextNodes: function (graph, startNodeId) {
+      allEdges: function (graph, startNodeId) {
         return graph.findAll('edge', function (edge) {
           return edge.getModel().source === startNodeId
         })
@@ -448,12 +448,12 @@
         return source.get('edges').filter(e => e.get('source') === source && e.get('target') === target)[0]
       },
       deleteFromNodeToLCAConnectionNode: function (node) {
-        let { getNextNode, getPreviousNode, doDelete, findLCANode, findLCAConnectionNode, graph, nextNodes, refreshGraph } = this
+        let { getNextNode, getPreviousNode, doDelete, findLCANode, findLCAConnectionNode, graph, allEdges, refreshGraph } = this
         // 1. 找条件节点
         let parentNode = node.get('edges').filter(e => e.get('target') === node)[0].get('source')
         let parentId = parentNode.get('id')
         // 2. 根据同一层条件节点找LCA
-        let nodeLCA = findLCANode(nextNodes, graph, parentId, findLCAConnectionNode)
+        let nodeLCA = findLCANode(allEdges, graph, parentId, findLCAConnectionNode)
         //查询兄弟节点
         let siblingNodes = node.get('edges').filter(e => e.get('target') === node)[0].get('source').
           get('edges').
