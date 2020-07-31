@@ -21,7 +21,7 @@ const connectionNode = {
             id: cfg.id,
             x: 0,
             y: 0,
-            r: 0,
+            r: 5,
             fill: "#ffffff",
             stroke: '#4444',
             opacity: 1
@@ -64,6 +64,8 @@ const connectionNode = {
         return [
           [0.5,0],
           [0.5,1],
+          [1,0.5],
+          [0,0.5],
         ]
       }
     },'single-node');

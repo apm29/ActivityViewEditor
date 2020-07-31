@@ -94,7 +94,7 @@ const addConditionBtnNode = {
         //两个锚点在顶部中心,底部中心
         return [
           [0.5, 0],
-          [0.5, 0],
+          [0.5, 1],
         ]
       },
     }, 'single-node')

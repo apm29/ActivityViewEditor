@@ -1,24 +1,26 @@
 <template>
-    <div>
+    <div :style="{width: width , maxHeight: height, minHeight: height}">
         <div ref="container" id="container"
-             style="width: 100%;height: 100%;background-color: antiquewhite"
+             :style="{width: width , maxHeight: height, minHeight: height}"
         >
 
         </div>
         <Modal
                 v-model="dialogConfigs.showAddType"
-                :title="`添加:${!!dialogConfigs.parentNode?dialogConfigs.parentNode.getModel().id:''}`">
+                title="添加:">
             <Button long type="primary" @click="addStepNode(dialogConfigs.parentNode,'action')">审批步骤</Button>
             <br><br>
             <Button long type="info" @click="addStepNode(dialogConfigs.parentNode,'condition')">审批条件</Button>
             <div slot="footer">
             </div>
         </Modal>
+        <Button size="large" style="position: fixed;right: 30px;bottom: 30px" @click="save">SAVE</Button>
+        <div id="miniMap" style="position: fixed;left: 30px;bottom: 30px"></div>
     </div>
 </template>
 
 <script>
-  import G6, { Minimap } from '@antv/g6'
+  import G6 from '@antv/g6'
   import initiatorNode from '@/components/flow/InitiatorNode'
   import addBtnNode from '@/components/flow/AddBtnNode'
   import conditionNode from '@/components/flow/ConditionNode'
@@ -28,12 +30,18 @@
   import connectionNode from '@/components/flow/ConnecttionNode'
   import { uniqueId } from '@/utils'
 
-  const miniMap = new Minimap({
-    size: [200, 100],
-    className: 'minimap',
-  })
   export default {
     name: 'Home',
+    props:{
+      height:{
+        type:[String,Number],
+        default:'100vh'
+      },
+      width: {
+        type: [String,Number],
+        default: '100vw'
+      },
+    },
     data: function () {
       return {
         dialogConfigs: {
@@ -71,7 +79,10 @@
       }
     },
     mounted () {
-
+      const grid = new G6.Grid();
+      const miniMap = new G6.Minimap({
+        container:'miniMap'
+      });
       this.graph = new G6.Graph({
         container: 'container',
         width: this.$refs.container.clientWidth,
@@ -83,13 +94,15 @@
           default: ['drag-canvas', 'zoom-canvas'],
           edit: ['click-select'],
         },
+        plugins: [grid, miniMap],
         layout: {
           type: 'dagre',
           center: [200, 200],
-          sortByCombo: true,
+          preventOverlap: true,
+          controlPoints:true,
           rankdir: 'TB',
           ranksep: 20,
-          nodesep: 120,
+          nodesep: 90,
         },
         defaultEdge: {
           type: 'polyline',
@@ -101,7 +114,6 @@
         },
       })
       let { graph } = this
-      graph.addPlugin(miniMap)
       initiatorNode.register(graph)
       addBtnNode.register(graph, this.showAdd)
       conditionNode.register(graph)
@@ -118,7 +130,7 @@
       //添加步骤
       //type:办理人/审批人/条件
       addStepNode: function (node, type) {
-        let { data, graph, dialogConfigs } = this
+        let { graph, dialogConfigs } = this
         let parentId = node.get('id')
         if (type === 'action') {
           let actionId = uniqueId('action')
@@ -242,52 +254,102 @@
       },
       //添加条件
       addConditionNode: function (node) {
-        let { findNearestNode, graph } = this
+        let { findLCANode, findLCAConnectionNode, graph, nextNodes } = this
         let parentId = node.get('id')
         let conditionId = uniqueId('conditionNode')
-        console.log(parentId)
-
-        //找到距离parentNode边数最少的connectionNode(最短路径问题)
-        let connectionNode = findNearestNode(graph, parentId)
-
-        let edge = graph.find('edge', function (edge) {
-          return edge.getModel().source === parentId
-        })
-        graph.addItem('node', {
-          type: 'conditionNode',
-          source: parentId,
-          target: conditionId,
-        })
+        let addId = uniqueId('addBtnNode')
+        let connectionNode = findLCANode(nextNodes, graph, parentId, findLCAConnectionNode)
+        if (connectionNode) {
+          graph.addItem('node', {
+            type: 'conditionNode',
+            id: conditionId,
+          })
+          graph.addItem('node', {
+            type: 'addBtnNode',
+            id: addId,
+          })
+          graph.addItem('edge', {
+            source: parentId,
+            target: conditionId,
+          })
+          graph.addItem('edge', {
+            source: conditionId,
+            target: addId,
+          })
+          graph.updateLayout({})
+          graph.fitView()
+          graph.addItem('edge', {
+            source: addId,
+            target: connectionNode.get('id'),
+          })
+        }
 
         graph.updateLayout({})
         graph.fitView()
       },
-      nextNodes: function (graph, parentId) {
+      nextNodes: function (graph, startNodeId) {
         return graph.findAll('edge', function (edge) {
-          return edge.getModel().source === parentId
+          return edge.getModel().source === startNodeId
         })
       },
-      findNearestNode (graph, parentId) {
-        let step = 0
-        let allChildrenEdge = this.nextNodes(graph, parentId)
-        let stepArray = Array(allChildrenEdge.length).fill(1)
-        console.log(allChildrenEdge)
+      findLCANode: function (nextNodes, graph, parentId, findLCAConnectionNode) {
+        //找到距离parentNode边数最少的connectionNode(最短路径问题)
+        let map = new Map()
+        //findNearestNode(graph, parentId, map, 0)
+        let nodes = nextNodes(graph, parentId).map(e => e.get('target'))
+        while (nodes.length > 1) {
+          //当最短路径节点有多个时,继续往下寻找
+          findLCAConnectionNode(graph, nodes, map, 0)
+          nodes = Array.from(map.keys()).reduce((sum, key) => {
+            if (sum.length === 0) {
+              sum.push(key)
+            } else {
+              sum = sum.filter(e => map.get(e) <= map.get(key))
+              if (sum.length === 0 || sum.every(e => map.get(e) === map.get(key))) {
+                sum.push(key)
+              }
+            }
+            return sum
+          }, [])
+        }
+        return nodes[0]
+      },
+      //递归方式寻找LCA(最近共同父节点(这里是向下找共同的ConnectionNode))
+      findLCAConnectionNode: function (graph, nodes, map, baseStep) {
+        nodes.forEach(node => {
+          let currentParent = node
+          let edges = currentParent.get('edges').filter(edge => edge.get('source') === currentParent)
+          let step = baseStep
+          while (edges.length === 1 && edges[0].get('target').getModel().type !== 'connectionNode') {
+            let target = edges[0].get('target')
+            currentParent = target
+            edges = target.get('edges').filter(edge => edge.get('source') === currentParent)
+            step += 1
+          }
+          if (edges.length === 1) {
+            //connectionNode
+            map.set(edges[0].get('target'), step)
+          } else {
+            //分支
+            this.findLCAConnectionNode(graph, edges.map(e => e.get('target')), map, --step)
+          }
+        })
       },
       //显示添加对话框
       showAdd: function (ev) {
         this.dialogConfigs.parentNode = ev.item
         this.dialogConfigs.showAddType = true
       },
-
+      save:function () {
+        this.$Modal.info({
+          content:'已打印到控制台Console'
+        })
+        let graphData = this.graph.save()
+        console.log(graphData)
+        this.$emit('activity-graph',graphData)
+      }
     },
   }
 </script>
 <style>
-    #container {
-        position: relative;
-        min-height: 100vh;
-        max-height: 100vh;
-        width: 100%;
-        height: 100%;
-    }
 </style>
