@@ -27,4 +27,8 @@ function toString(sth) {
   return sth == null || !sth ? "" : sth.toString();
 }
 
-export { uniqueId };
+function deepCloneJson(json) {
+  return JSON.parse(JSON.stringify(json));
+}
+
+export { uniqueId, deepCloneJson };
