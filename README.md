@@ -1,4 +1,4 @@
-# activityview
+# activity_view
 
 ## Project setup
 ```

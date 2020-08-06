@@ -77,7 +77,7 @@ import actionNode from "@/components/flow/node/ActionNode";
 import endNode from "@/components/flow/node/EndNode";
 import connectionNode from "@/components/flow/node/ConnecttionNode";
 import { uniqueId } from "@/components/utils";
-import JSONDisplay from '@/components/display/JSONDisplay'
+import JSONDisplay from "@/components/display/JSONDisplay";
 
 export default {
   name: "ActivityEditor",
@@ -94,8 +94,8 @@ export default {
   },
   data: function() {
     return {
-      display:false,
-      model:{},
+      display: false,
+      model: {},
       dialogConfigs: {
         showAddType: false,
         parentNode: undefined,
@@ -595,11 +595,11 @@ export default {
     },
     save: function() {
       let graphData = this.graph.save();
-      this.display = true
+      this.display = true;
       this.model = {
-        nodes:graphData.nodes,
-        edges:graphData.edges
-      }
+        nodes: graphData.nodes,
+        edges: graphData.edges
+      };
       this.$emit("activity-graph", graphData);
     },
     makeItSimple: function() {
