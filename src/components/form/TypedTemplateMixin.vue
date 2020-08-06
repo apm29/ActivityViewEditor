@@ -71,7 +71,7 @@
               { value: '0', label: '选项1', disabled: false },
               { value: '1', label: '选项2', disabled: false },
               { value: '2', label: '选项3', disabled: false },
-              { value: '3', label: '选项4', disabled: true },
+              { value: '3', label: '选项4', disabled: false },
             ],
           },
           {
@@ -234,6 +234,7 @@
           {
             id: 11,
             type: 'IntroductionText',
+            field: 'introduction',
             templateName: '说明文字',
             native: true,
             value: '这是一段说明文字',

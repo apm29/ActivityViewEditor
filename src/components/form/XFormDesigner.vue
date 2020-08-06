@@ -39,16 +39,28 @@
                     <div id="form-created"></div>
                 </Col>
             </Row>
-            <Button
-                    @click="preview = !preview"
-                    color="success"
-                    shape="circle"
-                    size="large"
-                    style="position: fixed;bottom: 30px;right: 30px"
-            >
-                {{ preview ? '关闭预览' : '启用预览' }}
-            </Button>
+            <ButtonGroup style="position: fixed;bottom: 30px;right: 30px">
+                <Button
+                        @click="preview = !preview"
+                        color="success"
+                        shape="circle"
+                        size="large"
+                >
+                    {{ preview ? '关闭预览' : '启用预览' }}
+                </Button>
+                <Button
+                        @click="displayModel"
+                        color="success"
+                        shape="circle"
+                        size="large"
+                >
+                    显示数据
+                </Button>
+            </ButtonGroup>
         </Content>
+        <Modal v-model="display" scrollable width="65vw">
+            <JSONDisplay title="数据" :value="model"></JSONDisplay>
+        </Modal>
     </Layout>
 </template>
 
@@ -59,9 +71,11 @@
   import TypeMixin from '@/components/form/TypedTemplateMixin'
   import IntroductionText from '@/components/form/native/IntroductionText'
   import XComponentMenu from '@/components/form/XComponentMenu'
+  import JSONDisplay from '@/components/display/JSONDisplay'
   export default {
     name: 'XFormDesigner',
     components: {
+      JSONDisplay,
       XComponentMenu,
       IntroductionText,
       draggable,
@@ -73,6 +87,8 @@
         createdRules: [],
         $f: undefined,
         preview: true,
+        display: false,
+        model: { }
       }
     },
 
@@ -124,21 +140,27 @@
       createForm: async function () {
         let root = document.getElementById('form-created')
 
-        let upload = this.createdRules.find(ele => {
-          return this.attachment(ele)
+        let upload = this.createdRules.filter(ele => {
+          return this.attachment(ele) || this.imageUpload(ele)
         })
-        if (upload) {
-          upload.props.onSuccess = function (res, file) {
-            file.url = res.data.filePath
-          }
+        if (upload && upload.length>0) {
+          upload.forEach(item=>{
+            item.props.onSuccess = function (res, file) {
+              file.url = res.data.filePath
+            }
+          })
         }
         if (root) {
           root.innerHTML = ''
           this.$f = formCreate.create(this.createdRules, {
             el: root,
-            onSubmit: function (formData) {
+            onSubmit:  (formData)=>{
               //按钮进入提交状态
               console.log(formData)
+              if(this.$f){
+                this.model = formData
+                this.display = true
+              }
             },
           })
           // let { $f } = this
@@ -170,6 +192,12 @@
           // console.log($f.sync($f.fields()[$f.fields().length - 1]))
         }
       },
+      displayModel:function () {
+        if(this.$f){
+          this.model = this.$f.model()
+          this.display = true
+        }
+      }
     },
   }
 </script>
@@ -220,7 +248,7 @@
         top: 73px;
         max-height: 480px;
         background: #fdfdfd;
-        margin-top: 53px;
+        margin-top: 43px;
     }
 
 
@@ -240,7 +268,7 @@
         background: #fdfdfd;
         /*border: 1px #333 dashed;*/
         overflow-y: auto;
-        margin-top: 53px;
+        margin-top: 43px;
         padding: 24px 16px;
     }
 

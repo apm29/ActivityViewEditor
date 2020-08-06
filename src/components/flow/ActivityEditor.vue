@@ -10,15 +10,15 @@
         long
         type="primary"
         @click="addStepNode(dialogConfigs.parentNode, 'action')"
-        >审批步骤</Button
-      >
+        >审批步骤
+      </Button>
       <br /><br />
       <Button
         long
         type="info"
         @click="addStepNode(dialogConfigs.parentNode, 'condition')"
-        >审批条件</Button
-      >
+        >审批条件
+      </Button>
       <div slot="footer"></div>
     </Modal>
     <Drawer
@@ -51,8 +51,8 @@
           type="error"
           long
           @click="deleteAction(dialogConfigs.editConditionData)"
-          >删除审批流程</Button
-        >
+          >删除审批流程
+        </Button>
       </template>
     </Drawer>
     <ButtonGroup style="position: fixed;right: 30px;bottom: 30px">
@@ -61,6 +61,9 @@
       <Button size="large" @click="reset">RESET</Button>
     </ButtonGroup>
     <div id="miniMap" style="position: fixed;left: 30px;bottom: 30px"></div>
+    <Modal v-model="display" scrollable width="65vw">
+      <j-s-o-n-display title="数据" :value="model"></j-s-o-n-display>
+    </Modal>
   </div>
 </template>
 
@@ -74,9 +77,11 @@ import actionNode from "@/components/flow/node/ActionNode";
 import endNode from "@/components/flow/node/EndNode";
 import connectionNode from "@/components/flow/node/ConnecttionNode";
 import { uniqueId } from "@/components/utils";
+import JSONDisplay from '@/components/display/JSONDisplay'
 
 export default {
   name: "ActivityEditor",
+  components: { JSONDisplay },
   props: {
     height: {
       type: [String, Number],
@@ -89,6 +94,8 @@ export default {
   },
   data: function() {
     return {
+      display:false,
+      model:{},
       dialogConfigs: {
         showAddType: false,
         parentNode: undefined,
@@ -588,25 +595,11 @@ export default {
     },
     save: function() {
       let graphData = this.graph.save();
-      this.$Modal.info({
-        title: "节点与边",
-        render: h => {
-          return h(
-            "div",
-            {
-              style: {
-                width: "100%",
-                height: "320px",
-                overflow: "auto"
-              }
-            },
-            `nodes:\r\n[${graphData.nodes.map(node => node.id)}],\r\n
-              edges:\r\n[${graphData.edges.map(edge => edge.id)}]`
-          );
-        },
-        scrollable: true
-      });
-      console.log(graphData);
+      this.display = true
+      this.model = {
+        nodes:graphData.nodes,
+        edges:graphData.edges
+      }
       this.$emit("activity-graph", graphData);
     },
     makeItSimple: function() {
