@@ -1,7 +1,7 @@
 <template>
   <div class="form-item-container">
     <div class="drag-handle" style="flex: 1">
-      <div :id="element.field" class="form-item-placeholder"></div>
+      <div :id="element.id" class="form-item-placeholder"></div>
     </div>
     <div class="setting-button">
       <Poptip
@@ -208,9 +208,9 @@ export default {
       this.drawer = false;
     },
     createItem: function() {
-      let root = document.getElementById(this.element.field);
-      root.innerHTML = "";
+      let root = document.getElementById(this.element.id);
       if (root) {
+        root.innerHTML = "";
         this.$f = formCreate.create([this.element], {
           el: root,
           submitBtn: false

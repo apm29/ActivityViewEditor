@@ -8,7 +8,12 @@
 <script>
 export default {
   name: "IntroductionText",
-  props: {}
+  props: {},
+  methods:{
+    log:function () {
+      console.log('IntroductionText')
+    }
+  }
 };
 </script>
 

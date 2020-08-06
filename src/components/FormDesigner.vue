@@ -127,7 +127,8 @@
   import XFormItem from '@/components/XFormItem'
   import TypeMixin from '@/components/TypeMixin'
   import IntroductionText from '@/components/IntroductionText'
-  const  LABEL_WIDTH = 72
+
+  const LABEL_WIDTH = 72
   export default {
     name: 'FormDesigner',
     components: {
@@ -324,13 +325,27 @@
             id: 11,
             type: 'IntroductionText',
             templateName: '说明文字',
-            field: 'info',
+            native:true,
+            name:'IntroductionText',
             children: ['这是一段说明文字'],
             props: {},
           },
+          {
+            id:12,
+            type:'i-button',
+            name: 'btn',
+            templateName: '测试Button',
+            native:true,
+            props:{
+              type:'primary',
+              field:'btn',
+              loading:true
+            },
+            children:['加载中']
+          }
         ],
         $f: undefined,
-        preview: false,
+        preview: true,
       }
     },
     computed: {
@@ -399,6 +414,33 @@
               console.log(formData)
             },
           })
+          // let { $f } = this
+          // //获取表单所有字段名
+          // console.log($f.fields())
+          // //获取表单的键值对
+          // console.log($f.formData())
+          // //获取指定字段的值
+          // console.log($f.getValue($f.fields()[0]))
+          // //表单的全局配置
+          // console.log($f.config)
+          // //表单的生成规则
+          // console.log($f.rule)
+          // //设置指定字段的值
+          // console.log($f.setValue($f.fields()[0], '123'))
+          // //获取双向数据绑定的表单键值对
+          // console.log($f.bind())
+          // //获取指定组件生成规则
+          // console.log($f.getRule($f.fields()[$f.fields().length - 1]))
+          // //获取表单组件的生成规则
+          // console.log($f.model())
+          // //获取自定义组件生成规则
+          // console.log($f.component())
+          // //调用生成组件的方法
+          // //$f.method('input','focus')()
+          // //获取组件的vm/dom元素
+          // console.log($f.el($f.fields()[$f.fields().length - 1]))
+          // //手动重新渲染指定组件
+          // console.log($f.sync($f.fields()[$f.fields().length - 1]))
         }
       },
 
@@ -416,30 +458,31 @@
     .side-bar {
         background-color: #ffffff;
     }
+
     /*定义滚动条高宽及背景
      高宽分别对应横竖滚动条的尺寸*/
-    .form-area > ::-webkit-scrollbar
-    {
-        width:3px;
-        height:3px;
-        background-color:#F5F5F5;
+    .form-area > ::-webkit-scrollbar {
+        width: 3px;
+        height: 3px;
+        background-color: #F5F5F5;
     }
+
     /*定义滚动条轨道
      内阴影+圆角*/
-    .form-area > ::-webkit-scrollbar-track
-    {
-        -webkit-box-shadow:inset 0 0 3px rgba(222,222,222,0.6);
-        border-radius:3px;
-        background-color:#F5F5F5;
+    .form-area > ::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 3px rgba(222, 222, 222, 0.6);
+        border-radius: 3px;
+        background-color: #F5F5F5;
     }
+
     /*定义滑块
      内阴影+圆角*/
-    .form-area > ::-webkit-scrollbar-thumb
-    {
-        border-radius:10px;
-        -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,.3);
-        background-color:#ccc;
+    .form-area > ::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+        background-color: #ccc;
     }
+
     .main-content {
         height: 100%;
         width: 100%;
@@ -460,7 +503,7 @@
         margin-top: 53px;
     }
 
-    .template-area{
+    .template-area {
         display: flex;
         flex-wrap: wrap;
         flex-direction: row;
