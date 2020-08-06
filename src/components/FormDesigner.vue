@@ -127,7 +127,7 @@
   import XFormItem from '@/components/XFormItem'
   import TypeMixin from '@/components/TypeMixin'
   import IntroductionText from '@/components/IntroductionText'
-
+  const  LABEL_WIDTH = 72
   export default {
     name: 'FormDesigner',
     components: {
@@ -149,7 +149,7 @@
             value: '',
             col: {
               span: 24,
-              labelWidth: 85,
+              labelWidth: LABEL_WIDTH,
             },
             props: {
               type: 'text',
@@ -165,7 +165,7 @@
             value: '',
             col: {
               span: 24,
-              labelWidth: 85,
+              labelWidth: LABEL_WIDTH,
             },
             props: {
               type: 'number',
@@ -181,7 +181,7 @@
             value: '',
             col: {
               span: 24,
-              labelWidth: 85,
+              labelWidth: LABEL_WIDTH,
             },
             props: {
               type: 'textarea',
@@ -197,7 +197,7 @@
             value: '0',
             col: {
               span: 24,
-              labelWidth: 85,
+              labelWidth: LABEL_WIDTH,
               placeholder: '请选择',
             },
             options: [
@@ -216,7 +216,7 @@
             value: ['1', '2', '3'],
             col: {
               span: 24,
-              labelWidth: 85,
+              labelWidth: LABEL_WIDTH,
             },
             options: [
               { value: '1', label: '好用', disabled: true },
@@ -237,7 +237,7 @@
             value: ['104', '105'],
             col: {
               span: 24,
-              labelWidth: 85,
+              labelWidth: LABEL_WIDTH,
             },
             options: [
               { value: '104', label: '生态蔬菜', disabled: false },
@@ -259,7 +259,7 @@
             value: '1',
             col: {
               span: 24,
-              labelWidth: 85,
+              labelWidth: LABEL_WIDTH,
             },
             props: {
               trueValue: '1',
@@ -279,7 +279,7 @@
             value: new Date(),
             col: {
               span: 24,
-              labelWidth: 85,
+              labelWidth: LABEL_WIDTH,
             },
             props: {
               type: 'datetimerange',
@@ -297,7 +297,7 @@
             value: new Date(),
             col: {
               span: 24,
-              labelWidth: 85,
+              labelWidth: LABEL_WIDTH,
             },
             props: {
               type: 'time',
@@ -313,7 +313,7 @@
             value: 3,
             col: {
               span: 24,
-              labelWidth: 85,
+              labelWidth: LABEL_WIDTH,
             },
             props: {
               count: 10,
@@ -390,7 +390,7 @@
               '*': {
                 col: {
                   span: 24,
-                  labelWidth: 85,
+                  labelWidth: LABEL_WIDTH,
                 },
               },
             },
