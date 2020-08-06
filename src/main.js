@@ -5,7 +5,7 @@ import store from "./store";
 import ViewUI from "view-design";
 import "view-design/dist/styles/iview.css";
 import formCreate from "@form-create/iview4";
-import IntroductionText from "@/components/IntroductionText";
+import IntroductionText from "@/components/form/native/IntroductionText";
 formCreate.component(IntroductionText.name, IntroductionText);
 Vue.use(formCreate);
 Vue.config.productionTip = false;

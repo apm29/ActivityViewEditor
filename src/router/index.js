@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Editor from "../components/Editor.vue";
+import Editor from "../components/flow/ActivityEditor.vue";
 
 Vue.use(VueRouter);
 
@@ -13,7 +13,7 @@ const routes = [
   {
     path: "/form",
     name: "Form",
-    component: () => import("@/components/FormDesigner")
+    component: () => import("@/components/form/XFormDesigner")
   }
 ];
 

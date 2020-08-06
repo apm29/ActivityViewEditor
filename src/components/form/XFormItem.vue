@@ -122,7 +122,7 @@
 
 <script>
 import formCreate from "@form-create/iview4";
-import TypeMixin from "@/components/TypeMixin";
+import TypeMixin from "@/components/form/TypedTemplateMixin";
 import draggable from "vuedraggable";
 import { uniqueId } from "@/components/utils";
 

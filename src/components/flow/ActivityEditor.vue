@@ -66,13 +66,13 @@
 
 <script>
 import G6 from "@antv/g6";
-import initiatorNode from "@/components/flow/InitiatorNode";
-import addBtnNode from "@/components/flow/AddBtnNode";
-import conditionNode from "@/components/flow/ConditionNode";
-import addConditionBtnNode from "@/components/flow/AddConditionBtnNode";
-import actionNode from "@/components/flow/ActionNode";
-import endNode from "@/components/flow/EndNode";
-import connectionNode from "@/components/flow/ConnecttionNode";
+import initiatorNode from "@/components/flow/node/InitiatorNode";
+import addBtnNode from "@/components/flow/node/AddBtnNode";
+import conditionNode from "@/components/flow/node/ConditionNode";
+import addConditionBtnNode from "@/components/flow/node/AddConditionBtnNode";
+import actionNode from "@/components/flow/node/ActionNode";
+import endNode from "@/components/flow/node/EndNode";
+import connectionNode from "@/components/flow/node/ConnecttionNode";
 import { uniqueId } from "@/components/utils";
 
 export default {
