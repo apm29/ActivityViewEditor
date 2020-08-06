@@ -66,6 +66,14 @@ export default {
       let { element } = this;
       return element.type === "IntroductionText";
     },
+    isAttachment: function() {
+      let { element } = this;
+      return element.type === "upload" && element.props.uploadType !== "image";;
+    },
+    isImage: function() {
+      let { element } = this;
+      return element.type === "upload" && element.props.uploadType === "image";
+    },
     textDefaultValue: function() {
       return this.isSingleLineText || this.isMultipleLineText;
     },
@@ -78,7 +86,9 @@ export default {
         !this.isRadio &&
         !this.isSwitch &&
         !this.isRate &&
-        !this.isAlert
+        !this.isAlert &&
+        !this.isAttachment &&
+        !this.isImage
       );
     },
     hasOptions: function() {
@@ -131,6 +141,12 @@ export default {
     },
     alert: function(element) {
       return element.type === "IntroductionText";
+    },
+    attachment: function(element) {
+      return element.type === "upload" && element.props.uploadType !== "image";;
+    },
+    imageUpload: function(element) {
+      return element.type === "upload" && element.props.uploadType === "image";
     }
   }
 };

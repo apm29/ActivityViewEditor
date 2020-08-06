@@ -2,7 +2,7 @@ import G6 from "@antv/g6";
 import { uniqueId } from "@/components/utils";
 import logo from "@/assets/icons/close.svg";
 const endNode = {
-  register(graph) {
+  register() {
     G6.registerNode(
       "endNode",
       {
@@ -128,7 +128,7 @@ const endNode = {
               break;
           }
         },
-        getAnchorPoints(cfg) {
+        getAnchorPoints() {
           //两个锚点都在顶部中心
           return [
             [0.5, 0],

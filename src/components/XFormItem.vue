@@ -44,7 +44,9 @@
         <FormItem label="说明文字" v-if="isAlert">
           <Input
             type="textarea"
-            v-model="element.children[0]"
+            v-model="element.value"
+            :maxlength="1000"
+            show-word-limit
             placeholder="输入说明文字"
           ></Input>
         </FormItem>

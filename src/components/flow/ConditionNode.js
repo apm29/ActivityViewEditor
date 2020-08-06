@@ -2,7 +2,7 @@ import G6 from "@antv/g6";
 import { uniqueId } from "@/components/utils";
 import logo from "@/assets/logo.png";
 const conditionNode = {
-  register(graph) {
+  register() {
     G6.registerNode(
       "conditionNode",
       {
@@ -112,7 +112,7 @@ const conditionNode = {
               break;
           }
         },
-        getAnchorPoints(cfg) {
+        getAnchorPoints() {
           //两个锚点在顶部中心,底部中心
           return [
             [0.5, 0],

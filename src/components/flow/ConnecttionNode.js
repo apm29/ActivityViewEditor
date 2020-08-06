@@ -3,7 +3,7 @@ import { uniqueId } from "@/components/utils";
 import logo from "@/assets/logo.png";
 
 const connectionNode = {
-  register(graph) {
+  register() {
     G6.registerNode(
       "connectionNode",
       {
@@ -62,7 +62,7 @@ const connectionNode = {
               break;
           }
         },
-        getAnchorPoints(cfg) {
+        getAnchorPoints() {
           //两个锚点都在底部中心
           return [
             [0.5, 0],

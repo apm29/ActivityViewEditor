@@ -3,7 +3,7 @@ import { uniqueId } from "@/components/utils";
 import logo from "@/assets/logo.png";
 
 const addConditionBtnNode = {
-  register(graph) {
+  register() {
     G6.registerNode(
       "addConditionBtnNode",
       {
@@ -112,7 +112,7 @@ const addConditionBtnNode = {
               break;
           }
         },
-        getAnchorPoints(cfg) {
+        getAnchorPoints() {
           //两个锚点在顶部中心,底部中心
           return [
             [0.5, 0],

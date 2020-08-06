@@ -3,7 +3,7 @@ import { uniqueId } from "@/components/utils";
 import logo from "@/assets/logo.png";
 
 const addBtnNode = {
-  register(graph, onClick) {
+  register() {
     G6.registerNode(
       "addBtnNode",
       {
@@ -93,7 +93,7 @@ const addBtnNode = {
               break;
           }
         },
-        getAnchorPoints(cfg) {
+        getAnchorPoints() {
           //两个锚点在顶部中心,底部中心
           return [
             [0.5, 0],
