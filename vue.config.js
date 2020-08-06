@@ -10,6 +10,7 @@ module.exports = {
     port: 9611
   },
   configureWebpack: {
+    name:'流程编辑器',
     context: path.resolve(__dirname, "./"),
     //别名配置
     resolve: {
