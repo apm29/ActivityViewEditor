@@ -5,6 +5,7 @@
 <script>
 import formCreate from "@form-create/iview4";
 import TypedTemplateMixin from "@/components/form/TypedTemplateMixin";
+import { deepCloneJson } from '@/components/utils'
 
 export default {
   name: "XFormPreview",
@@ -34,11 +35,12 @@ export default {
       return this.$f.model();
     },
     updateRule: function(field, rule) {
-      this.$f.updateRule(field, rule);
+      let ruleIndex = this.createdRules.findIndex(e=>e.field === field)
+      this.createdRules[ruleIndex] = rule
+      this.createForm();
     },
     createForm: async function() {
       let root = document.getElementById("form-created");
-
       let upload = this.createdRules.filter(ele => {
         return this.attachment(ele) || this.imageUpload(ele);
       });
@@ -51,6 +53,7 @@ export default {
       }
       if (root) {
         root.innerHTML = "";
+        console.info('preview recreate')
         this.$f = formCreate.create(this.createdRules, {
           el: root,
           onSubmit: formData => {
@@ -96,13 +99,4 @@ export default {
 </script>
 
 <style scoped>
-#form-created {
-  width: 294px;
-  height: 480px;
-  background: #fdfdfd;
-  /*border: 1px #333 dashed;*/
-  overflow-y: auto;
-  margin-top: 43px;
-  padding: 24px 16px;
-}
 </style>

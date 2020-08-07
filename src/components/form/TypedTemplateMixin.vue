@@ -21,7 +21,8 @@ export default {
           props: {
             type: "text",
             placeholder: "请输入"
-          }
+          },
+          validate:[]
         },
         {
           id: 2,
@@ -143,7 +144,7 @@ export default {
           field: "datepicker",
           title: "日期选择",
           templateName: "日期选择",
-          value: ["2020-08-03", "2020-08-04"],
+          value: [new Date(), new Date()],
           col: {
             span: 24,
             labelWidth: LABEL_WIDTH
@@ -161,7 +162,7 @@ export default {
           field: "timepicker",
           title: "时间选择",
           templateName: "时间选择",
-          value: "12:22:35",
+          value: new Date(),
           col: {
             span: 24,
             labelWidth: LABEL_WIDTH

@@ -104,6 +104,8 @@ export default {
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
+  align-content: start;
+  height: 100%;
 }
 
 .template-item {

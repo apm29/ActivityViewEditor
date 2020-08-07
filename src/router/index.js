@@ -14,6 +14,16 @@ const routes = [
     path: "/form",
     name: "Form",
     component: () => import("@/components/form/XFormDesigner")
+  },
+  {
+    path: "/preview",
+    name: "Preview",
+    component: () => import("@/views/preview")
+  },
+  {
+    path: "/design",
+    name: "Design",
+    component: () => import("@/views/design")
   }
 ];
 
