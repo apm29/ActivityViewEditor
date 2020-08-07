@@ -6,6 +6,9 @@
         <div style="flex: 1;width: 100%">
             <Carousel ref="carousel" :height="height" v-model="index" arrow="never" dots="none">
                 <CarouselItem>
+                    <XFormBasicConfig></XFormBasicConfig>
+                </CarouselItem>
+                <CarouselItem>
                     <XFormDesigner></XFormDesigner>
                 </CarouselItem>
                 <CarouselItem>
@@ -20,14 +23,16 @@
   import XFormDesigner from '@/components/form/XFormDesigner'
   import ActivityEditor from '@/components/flow/ActivityEditor'
   import XTab from '@/components/display/XTab'
+  import XFormBasicConfig from '@/components/form/XFormBasicConfig'
 
-  const headerHeight = 75
+  const headerHeight = 64
   export default {
     name: 'design',
-    components: { XTab, ActivityEditor, XFormDesigner },
+    components: { XFormBasicConfig, XTab, ActivityEditor, XFormDesigner },
     data: function () {
       return {
         tabs: [
+          '基础设置',
           '表单设计',
           '流程设计',
         ],
@@ -57,7 +62,7 @@
 </script>
 
 <style scoped lang="less">
-    @header-height: 75px;
+    @header-height: 64px;
     .header {
         background-color: white;
         height: @header-height;

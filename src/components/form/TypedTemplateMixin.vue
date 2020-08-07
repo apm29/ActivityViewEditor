@@ -1,7 +1,7 @@
 <script>
 import { deepCloneJson, uniqueId } from "@/components/utils";
 
-const LABEL_WIDTH = 72;
+const LABEL_WIDTH = 82;
 export default {
   name: "TypedTemplateMixin",
   data: function() {

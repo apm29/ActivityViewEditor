@@ -22,7 +22,7 @@
 
         <Drawer v-model="drawer" :mask-closable="false" draggable width="280" inner
                 class-name=".edit-drawer">
-            <Form v-model="clonedData">
+            <Form v-model="clonedData" label-position="top">
                 <FormItem label="字段名">
                     <Input
                             v-model="clonedData.field"
