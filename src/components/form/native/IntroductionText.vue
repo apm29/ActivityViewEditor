@@ -1,5 +1,5 @@
 <template>
-  <div class="introduction-container">
+  <div class="introduction-container" :style="{justifyContent:justify}">
     <Icon v-if="icon" :type="icon" style="margin-right: 3px" />
     <div v-html="value" v-if="value"></div>
     <slot v-else></slot>
@@ -16,6 +16,10 @@ export default {
     },
     value: {
       type: String
+    },
+    justify:{
+      type:String,
+      default:'start'
     }
   }
 };

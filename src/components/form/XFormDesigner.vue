@@ -7,7 +7,9 @@
 
             <Row class="main-content" type="flex" justify="center" align="middle">
                 <Col :span="preview ? 12 : 24" class="form-area">
-                    <IntroductionText icon="ios-paper-outline">表单设计</IntroductionText>
+                    <IntroductionText icon="ios-paper-outline" justify="center">
+                        表单设计
+                    </IntroductionText>
                     <draggable
                             class="drop-area form"
                             :list="createdRules"
@@ -40,8 +42,8 @@
                 </Col>
 
                 <Col :span="12" class="form-area" v-show="preview">
-                    <IntroductionText icon="md-tablet-portrait"
-                    >实际表单
+                    <IntroductionText icon="md-tablet-portrait" justify="center">
+                        实际表单
                     </IntroductionText>
                     <XFormPreview
                             ref="form-preview"
