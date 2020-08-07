@@ -4,24 +4,7 @@
             <XComponentMenu></XComponentMenu>
         </Sider>
         <Content style="position: relative;">
-            <ButtonGroup style="position: absolute;top: 30px;right: 30px">
-                <Button
-                        @click="preview = !preview"
-                        color="success"
-                        shape="circle"
-                        size="large"
-                >
-                    {{ preview ? '关闭预览' : '启用预览' }}
-                </Button>
-                <Button
-                        @click="displayModel"
-                        color="success"
-                        shape="circle"
-                        size="large"
-                >
-                    显示数据
-                </Button>
-            </ButtonGroup>
+
             <Row class="main-content" type="flex" justify="center" align="middle">
                 <Col :span="preview ? 12 : 24" class="form-area">
                     <IntroductionText icon="ios-paper-outline">表单设计</IntroductionText>
@@ -66,6 +49,24 @@
                     ></XFormPreview>
                 </Col>
             </Row>
+            <ButtonGroup style="position: absolute;top: 30px;right: 30px">
+                <Button
+                        @click="preview = !preview"
+                        color="success"
+                        shape="circle"
+                        size="large"
+                >
+                    {{ preview ? '关闭预览' : '启用预览' }}
+                </Button>
+                <Button
+                        @click="displayModel"
+                        color="success"
+                        shape="circle"
+                        size="large"
+                >
+                    显示数据
+                </Button>
+            </ButtonGroup>
         </Content>
 
         <Modal v-model="display" scrollable width="65vw">

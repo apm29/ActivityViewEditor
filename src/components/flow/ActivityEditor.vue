@@ -79,12 +79,17 @@
   import { uniqueId } from '@/components/utils'
   import JSONDisplay from '@/components/display/JSONDisplay'
 
+  const grid = new G6.Grid()
+  const miniMap = new G6.Minimap({
+    container: 'miniMap',
+  })
   export default {
     name: 'ActivityEditor',
     components: { JSONDisplay },
     data: function () {
       return {
         initialized: false,
+        registered: false,
         display: false,
         model: {},
         dialogConfigs: {
@@ -125,6 +130,14 @@
       }
     },
 
+    mounted () {
+      this.handleResize()
+      window.addEventListener('resize', this.handleResize)
+    },
+    beforeDestroy () {
+      window.removeEventListener('resize', this.handleResize)
+    },
+
     methods: {
       init: function () {
         if (this.initialized) {
@@ -133,10 +146,7 @@
         if (this.$refs.container.clientWidth === 0 || this.$refs.container.clientHeight === 0) {
           return
         }
-        const grid = new G6.Grid()
-        const miniMap = new G6.Minimap({
-          container: 'miniMap',
-        })
+
         this.graph = new G6.Graph({
           container: 'container',
           width: this.$refs.container.clientWidth,
@@ -148,7 +158,7 @@
             default: ['drag-canvas', 'zoom-canvas'],
             edit: ['click-select'],
           },
-          enabledStack: true,
+          enabledStack: false,
           plugins: [grid, miniMap],
           layout: {
             type: 'dagre',
@@ -169,50 +179,64 @@
           },
         })
         let { graph } = this
-        initiatorNode.register(graph)
-        addBtnNode.register(graph, this.showAdd)
-        conditionNode.register(graph, this.showConditionEditDrawer)
-        addConditionBtnNode.register(graph, ev => this.addConditionNode(ev.item))
-        actionNode.register(graph, this.showActionEditDrawer)
-        endNode.register(graph)
-        connectionNode.register(graph)
-        graph.on('node:click', ev => {
-          //点击事件
-          if (ev.item.getModel().type === 'actionNode') {
-            this.showActionEditDrawer(ev)
-          }
-          if (ev.item.getModel().type === 'addBtnNode') this.showAdd(ev)
-          if (ev.item.getModel().type === 'conditionNode') {
-            this.showConditionEditDrawer(ev)
-          }
-          if (
-            ev.item.getModel().type === 'addConditionBtnNode' &&
-            ev.item.get('states').indexOf('hide') === -1
-          ) {
-            this.addConditionNode(ev.item)
-          }
-        })
-        // 点击时选中，再点击时取消
-        graph.on('node:mouseenter', ev => {
-          const node = ev.item
-          graph.setItemState(node, 'selected', true) // 切换选中
-        })
-        graph.on('node:mouseleave', ev => {
-          const node = ev.item
-          graph.setItemState(node, 'selected', false) // 切换选中
-        })
+        if (!this.registered) {
+          initiatorNode.register(graph)
+          addBtnNode.register(graph, this.showAdd)
+          conditionNode.register(graph, this.showConditionEditDrawer)
+          addConditionBtnNode.register(graph, ev => this.addConditionNode(ev.item))
+          actionNode.register(graph, this.showActionEditDrawer)
+          endNode.register(graph)
+          connectionNode.register(graph)
+          graph.on('node:click', ev => {
+            //点击事件
+            if (ev.item.getModel().type === 'actionNode') {
+              this.showActionEditDrawer(ev)
+            }
+            if (ev.item.getModel().type === 'addBtnNode') this.showAdd(ev)
+            if (ev.item.getModel().type === 'conditionNode') {
+              this.showConditionEditDrawer(ev)
+            }
+            if (
+              ev.item.getModel().type === 'addConditionBtnNode' &&
+              ev.item.get('states').indexOf('hide') === -1
+            ) {
+              this.addConditionNode(ev.item)
+            }
+          })
+          // 点击时选中，再点击时取消
+          graph.on('node:mouseenter', ev => {
+            const node = ev.item
+            graph.setItemState(node, 'selected', true) // 切换选中
+          })
+          graph.on('node:mouseleave', ev => {
+            const node = ev.item
+            graph.setItemState(node, 'selected', false) // 切换选中
+          })
+          this.registered = true
+        }
 
         graph.data(this.graphData)
         graph.render()
         this.initialized = true
-        graph.zoomTo(0.9,{
-          x:this.$refs.container.clientWidth/2,
-          y:this.$refs.container.clientHeight/2
-        });
+        graph.zoomTo(0.9, {
+          x: this.$refs.container.clientWidth / 2,
+          y: this.$refs.container.clientHeight / 2,
+        })
       },
       refreshGraph: function (graph) {
         graph.updateLayout({})
         graph.fitView()
+        graph.zoomTo(0.9, {
+          x: this.$refs.container.clientWidth / 2,
+          y: this.$refs.container.clientHeight / 2,
+        })
+      },
+
+      handleResize: function () {
+        let { graph } = this
+        if (graph) {
+          graph.changeSize(this.$refs.container.clientWidth, this.$refs.container.clientHeight )
+        }
       },
 
       //添加步骤
